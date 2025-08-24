@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz App</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="quiz-container">
+<div class="timer">Time Left: <span id="time">30</span>s</div>
+<div class="question">Question will appear here</div>
+<div class="options"></div>
+<div class="result">Your score: <span id="score">0</span></div>
+<button class="restart-btn">Restart Quiz</button>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
+
+
+body {
+font-family: Arial, sans-serif;
+background-color: #f4f4f9;
+color: #333;
+margin: 0;
+padding: 0;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+}
+
+quiz-container {
+background: #fff;
+border-radius: 12px;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+width: 90%;
+max-width: 600px;
+padding: 20px;
+text-align: center;
+}
+
+timer, .question, .result {
+margin-bottom: 20px;
+}
+
+options {
+display: flex;
+flex-direction: column;
+}
+
+option {
+padding: 10px;
+border: solid #ccc;
+border-radius: 8px;
+cursor: pointer;
+}
+
+option:hover {
+background-color: #007bff;
+}
+
+
+const quizData = [
+{ question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Lisbon"], answer: "Paris" },
+{ question: "Which language is used for web development?", options: ["Python", "HTML", "Java", "C++"], answer: "HTML" },
+];
+
+let currentQuestion = 0, score = 0, timeLeft = 30, timerInterval;
+
+const timerEl = document.getElementById('time');
+const questionEl = document.querySelector('.question');
+const optionsEl = document.querySelector('.options');
+const resultEl = document.querySelector('.result');
+const scoreEl = document.getElementById('score');
+const restartBtn = document.querySelector('.restart-btn');
+
+function loadQuestion() {
+if (currentQuestion >= quizData.length) return endQuiz();
+clearInterval(timerInterval);
+timeLeft = 30; timerEl.textContent = timeLeft; startTimer();
+
+const currentQuiz = quizData[currentQuestion];
+questionEl.textContent = currentQuiz.question;
+
+optionsEl.innerHTML = '';
+currentQuiz.options.forEach(option => {
+const button = document.createElement('button');
+button.classList.add('option');
+button.textContent = option;
+button.onclick = () => checkAnswer(option);
+optionsEl.appendChild(button);
+});
+}
+
+function checkAnswer(selectedOption) {
+if (selectedOption === quizData[currentQuestion].answer) score++;
+currentQuestion++; loadQuestion();
+}
+
+function startTimer() {
+timerInterval = setInterval(() => {
+timeLeft--; timerEl.textContent = timeLeft;
+if (timeLeft <= 0) endQuiz();
+}, 1000);
+}
+
+function endQuiz() {
+clearInterval(timerInterval);
+questionEl.style.display = 'none';
+optionsEl.style.display = 'none';
+resultEl.style.display = 'block';
+scoreEl.textContent = score;
+restartBtn.style.display = 'block';
+}
+
+restartBtn.addEventListener('click', () => {
+currentQuestion = score = timeLeft = timerInterval = null;
+location.reload();
+});
+
+loadQuestion();
